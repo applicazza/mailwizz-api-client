@@ -1,0 +1,15 @@
+language: php
+php:
+  - '7.0'
+  - nightly
+
+before_script:
+    - mkdir -p build/logs
+    - flags="--prefer-dist"
+    - composer install $flags
+
+script:
+  - vendor/bin/phpunit --coverage-clover build/logs/clover.xml -c phpunit.xml
+
+after_success:
+  - sh -c 'php vendor/bin/coveralls -v'

@@ -1,0 +1,33 @@
+{
+    "name": "applicazza/mailwizz-api-client",
+    "description": "Mailwizz API Client",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Artyom S.",
+            "email": "artyom@applicazza.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.2",
+        "spatie/fractalistic": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Applicazza\\MailwizzApiClient\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/Stub.php"
+        ]
+    },
+    "require-dev": {
+        "orchestra/testbench": "^3.3",
+        "phpunit/phpunit": "^5.7",
+        "satooshi/php-coveralls": "^1.0"
+    }
+}

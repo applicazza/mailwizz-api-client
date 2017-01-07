@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "data": {
+    "count": "2",
+    "total_pages": 1,
+    "current_page": 1,
+    "next_page": null,
+    "prev_page": null,
+    "records": [
+      {
+        "campaign_uid": "hw0336zrfz9ca",
+        "name": "Test #1",
+        "status": "sending"
+      },
+      {
+        "campaign_uid": "hz184ssc3h7a7",
+        "name": "Test #2",
+        "status": "paused"
+      }
+    ]
+  }
+}
