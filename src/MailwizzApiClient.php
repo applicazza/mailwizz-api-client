@@ -4,6 +4,7 @@ namespace Applicazza\MailwizzApiClient;
 
 use Applicazza\MailwizzApiClient\Endpoints;
 use Applicazza\MailwizzApiClient\Events;
+use Applicazza\MailwizzApiClient\Exceptions\InitializationException;
 use GuzzleHttp;
 use Illuminate\Foundation\Application;
 use Psr\Http\Message;
@@ -11,8 +12,6 @@ use Psr\Http\Message;
 /**
  * Class MailwizzApiClient
  * @package Applicazza\MailwizzApiClient
- *
- * @property \Applicazza\MailwizzApiClient\Endpoints\Campaign $campaigns
  */
 class MailwizzApiClient
 {
@@ -20,6 +19,21 @@ class MailwizzApiClient
      * @var \Applicazza\MailwizzApiClient\Endpoints\Campaign
      */
     public $campaigns;
+
+    /**
+     * @var \Applicazza\MailwizzApiClient\Endpoints\SubscribersList
+     */
+    public $lists;
+
+    /**
+     * @var \Applicazza\MailwizzApiClient\Endpoints\Subscriber
+     */
+    public $subscribers;
+
+    /**
+     * @var \Applicazza\MailwizzApiClient\Endpoints\Template
+     */
+    public $templates;
 
     /**
      * @var string
@@ -62,11 +76,6 @@ class MailwizzApiClient
     protected $publicKey = '';
 
     /**
-     * @var \Applicazza\MailwizzApiClient\Endpoints\Template
-     */
-    public $templates;
-
-    /**
      * @var int
      */
     protected $timeout = 30;
@@ -81,6 +90,8 @@ class MailwizzApiClient
     function __construct(string $endpoint = '', string $publicKey = '', string $privateKey = '', callable $handler = null)
     {
         $this->campaigns = new Endpoints\Campaign($this);
+        $this->lists = new Endpoints\SubscribersList($this);
+        $this->subscribers = new Endpoints\Subscriber($this);
         $this->templates = new Endpoints\Template($this);
 
         if (strlen($endpoint))
@@ -97,67 +108,6 @@ class MailwizzApiClient
     }
 
     /**
-     *
-     */
-    protected function createGuzzle()
-    {
-        $guzzleClientHandler = GuzzleHttp\HandlerStack::create($this->handler);
-
-        $guzzleClientHandler->push(GuzzleHttp\Middleware::mapRequest(function (Message\RequestInterface $request) {
-            return $this->signMailwizzRequest($request);
-        }));
-
-        $guzzleClientHandler->push(GuzzleHttp\Middleware::mapResponse(function (Message\ResponseInterface $response) {
-            return $this->emitResponseReceivedEvent($response);
-        }));
-
-        $guzzleClientOptions = [
-            'base_uri' => $this->getEndpoint(),
-            'handler' => $guzzleClientHandler,
-            'timeout' => $this->getTimeout(),
-        ];
-
-        $this->guzzle = new GuzzleHttp\Client($guzzleClientOptions);
-    }
-
-    /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    protected function emitResponseReceivedEvent(Message\ResponseInterface $response)
-    {
-        // Get required information
-
-        $httpStatusCode = $response->getStatusCode();
-
-        $httpResponse = $response->getBody()->getContents();
-
-        // Check if we are running under Laravel
-
-        if (class_exists(Application::class) && function_exists('event')) {
-
-            // Emit event
-
-            event(new Events\ResponseReceived($httpStatusCode, $httpResponse));
-
-        }
-
-        // Rewind stream
-
-        $response->getBody()->rewind();
-
-
-        // Fill local data
-
-        $this->lastRequestHttpResponse = $httpResponse;
-        $this->lastRequestHttpStatusCode = $httpStatusCode;
-
-        // Return response
-
-        return $response;
-    }
-
-    /**
      * @return string
      */
     public function getEndpoint(): string
@@ -167,21 +117,14 @@ class MailwizzApiClient
 
     /**
      * @return \GuzzleHttp\Client
+     * @throws \Applicazza\MailwizzApiClient\Exceptions\InitializationException
      */
     public function getGuzzle(): GuzzleHttp\Client
     {
         if (is_null($this->guzzle))
-            $this->createGuzzle();
+            throw new InitializationException;
 
         return $this->guzzle;
-    }
-
-    /**
-     * @return callable
-     */
-    public function getHandler(): callable
-    {
-        return $this->handler;
     }
 
     /**
@@ -257,16 +200,6 @@ class MailwizzApiClient
     }
 
     /**
-     * @param callable $handler
-     */
-    protected function setHandler(callable $handler)
-    {
-        $this->handler = $handler;
-
-        $this->createGuzzle();
-    }
-
-    /**
      * @param string $publicKey
      * @param string $privateKey
      */
@@ -308,6 +241,77 @@ class MailwizzApiClient
     public function setTimeout(int $timeout)
     {
         $this->timeout = $timeout;
+    }
+
+    /**
+     *
+     */
+    protected function createGuzzle()
+    {
+        $guzzleClientHandler = GuzzleHttp\HandlerStack::create($this->handler);
+
+        $guzzleClientHandler->push(GuzzleHttp\Middleware::mapRequest(function (Message\RequestInterface $request) {
+            return $this->signMailwizzRequest($request);
+        }));
+
+        $guzzleClientHandler->push(GuzzleHttp\Middleware::mapResponse(function (Message\ResponseInterface $response) {
+            return $this->emitResponseReceivedEvent($response);
+        }));
+
+        $guzzleClientOptions = [
+            'base_uri' => $this->getEndpoint(),
+            'handler' => $guzzleClientHandler,
+            'timeout' => $this->getTimeout(),
+        ];
+
+        $this->guzzle = new GuzzleHttp\Client($guzzleClientOptions);
+    }
+
+    /**
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function emitResponseReceivedEvent(Message\ResponseInterface $response)
+    {
+        // Get required information
+
+        $httpStatusCode = $response->getStatusCode();
+
+        $httpResponse = $response->getBody()->getContents();
+
+        // Check if we are running under Laravel
+
+        if (class_exists(Application::class) && function_exists('event')) {
+
+            // Emit event
+
+            event(new Events\ResponseReceived($httpStatusCode, $httpResponse));
+
+        }
+
+        // Rewind stream
+
+        $response->getBody()->rewind();
+
+
+        // Fill local data
+
+        $this->lastRequestHttpResponse = $httpResponse;
+        $this->lastRequestHttpStatusCode = $httpStatusCode;
+
+        // Return response
+
+        return $response;
+    }
+
+    /**
+     * @param callable $handler
+     */
+    protected function setHandler(callable $handler)
+    {
+        $this->handler = $handler;
+
+        $this->createGuzzle();
     }
 
     /**

@@ -8,7 +8,7 @@ use ArrayAccess;
  * Class AbstractContract
  * @package Applicazza\MailwizzApiClient\Contracts
  */
-abstract class AbstractContract implements ArrayAccess
+abstract class AbstractContract
 {
     /**
      * Campaign constructor.
@@ -36,27 +36,5 @@ abstract class AbstractContract implements ArrayAccess
         }
 
         return $this;
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->offsetExists($offset) ? $this->$offset : null;
-    }
-
-    public function offsetExists($offset)
-    {
-        return isset($this->$offset);
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        if (!is_null($offset))
-            $this->$offset = $value;
-    }
-
-    public function offsetUnset($offset)
-    {
-        if ($this->offsetExists($offset))
-            unset($this->$offset);
     }
 }

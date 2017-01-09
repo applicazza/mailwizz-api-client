@@ -6,19 +6,19 @@ use Applicazza\MailwizzApiClient\Contracts;
 use League\Fractal\TransformerAbstract;
 
 /**
- * Class TemplateTransformer
+ * Class SubscriberTransformer
  * @package Applicazza\MailwizzApiClient\Transformers
  */
-class TemplateTransformer extends TransformerAbstract
+class SubscriberTransformer extends TransformerAbstract
 {
     /**
      * Transforms object
      *
      * @param $template
-     * @return \Applicazza\MailwizzApiClient\Contracts\Template
+     * @return \Applicazza\MailwizzApiClient\Contracts\Subscriber
      */
     public function transform($template)
     {
-        return new Contracts\Template();
+        return new Contracts\Subscriber();
     }
 }

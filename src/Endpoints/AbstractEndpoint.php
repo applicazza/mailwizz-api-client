@@ -71,15 +71,15 @@ abstract class AbstractEndpoint
 
         } catch (GuzzleHttp\Exception\ConnectException $e) {
 
-            throw new Exceptions\MailwizzException($e);
+            throw new Exceptions\NetworkException($e);
 
         } catch (GuzzleHttp\Exception\RequestException $e) {
 
-            throw new Exceptions\MailwizzException($e);
+            throw new Exceptions\NetworkException($e);
 
         } catch (GuzzleHttp\Exception\TransferException $e) {
 
-            throw new Exceptions\MailwizzException($e);
+            throw new Exceptions\NetworkException($e);
 
         }
     }

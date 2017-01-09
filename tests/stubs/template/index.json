@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "data": {
+    "count": "0",
+    "total_pages": 1,
+    "current_page": 1,
+    "next_page": null,
+    "prev_page": null,
+    "records": []
+  }
+}

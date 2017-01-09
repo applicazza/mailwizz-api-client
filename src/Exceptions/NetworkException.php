@@ -5,10 +5,10 @@ namespace Applicazza\MailwizzApiClient\Exceptions;
 use Exception;
 
 /**
- * Class MailwizzException
+ * Class NetworkException
  * @package Applicazza\MailwizzApiClient\Exceptions
  */
-class MailwizzException extends Exception
+class NetworkException extends MailwizzException
 {
 
 }
